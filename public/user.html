@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carlo Cam</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 12px 32px; gap: 14px;
+      background: #0a0a0f; overflow-x: hidden; color: #fff;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(233,69,96,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(99,102,241,0.15) 0%, transparent 50%);
+      animation: bgPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes bgPulse { 0%{opacity:0.6} 100%{opacity:1} }
+
+    .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .particle { position: absolute; border-radius: 50%; animation: float linear infinite; opacity: 0.4; }
+    @keyframes float {
+      0%   { transform: translateY(100vh); opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.4; }
+      100% { transform: translateY(-100px); opacity: 0; }
+    }
+
+    .header { position: relative; z-index: 1; text-align: center; }
+    .header h1 {
+      font-size: 22px; font-weight: 700;
+      background: linear-gradient(135deg, #e94560, #a855f7, #6366f1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header .by { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+
+    .video-wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 400px;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 0 0 2px rgba(233,69,96,0.3), 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .video-wrap::after {
+      content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      border-radius: 20px;
+      background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.5) 100%);
+    }
+    #localVideo {
+      width: 100%; display: block; border-radius: 20px;
+      aspect-ratio: 4/3; background: #000;
+      transition: filter 0.3s;
+    }
+
+    /* CSS Filters */
+    #localVideo.f-normal    { filter: none; }
+    #localVideo.f-bw        { filter: grayscale(100%); }
+    #localVideo.f-sepia     { filter: sepia(90%); }
+    #localVideo.f-warm      { filter: saturate(160%) hue-rotate(-20deg) brightness(1.1); }
+    #localVideo.f-cool      { filter: saturate(130%) hue-rotate(40deg) brightness(0.95); }
+    #localVideo.f-vivid     { filter: saturate(280%) contrast(1.2); }
+    #localVideo.f-soft      { filter: blur(1.5px) brightness(1.15) saturate(110%); }
+    #localVideo.f-dark      { filter: brightness(0.45) contrast(1.5); }
+    #localVideo.f-neon      { filter: saturate(400%) brightness(1.3) contrast(1.4) hue-rotate(90deg); }
+    #localVideo.f-retro     { filter: sepia(60%) contrast(1.2) brightness(0.9) saturate(80%); }
+    #localVideo.f-sunset    { filter: hue-rotate(-30deg) saturate(220%) brightness(1.1); }
+    #localVideo.f-ocean     { filter: hue-rotate(180deg) saturate(160%) brightness(0.9); }
+    #localVideo.f-forest    { filter: hue-rotate(80deg) saturate(200%) brightness(0.95); }
+    #localVideo.f-purple    { filter: hue-rotate(270deg) saturate(220%) brightness(1.05); }
+    #localVideo.f-pink      { filter: hue-rotate(300deg) saturate(200%) brightness(1.15); }
+    #localVideo.f-gold      { filter: sepia(100%) saturate(350%) hue-rotate(10deg) brightness(1.1); }
+    #localVideo.f-ice       { filter: hue-rotate(200deg) saturate(70%) brightness(1.4) contrast(0.9); }
+    #localVideo.f-lava      { filter: saturate(350%) contrast(1.4) brightness(0.85) hue-rotate(350deg); }
+    #localVideo.f-cyberpunk { filter: saturate(350%) hue-rotate(270deg) contrast(1.5) brightness(1.1); }
+    #localVideo.f-pastel    { filter: saturate(60%) brightness(1.35) contrast(0.8); }
+    #localVideo.f-dramatic  { filter: contrast(2) brightness(0.8) saturate(130%); }
+    #localVideo.f-faded     { filter: contrast(0.65) brightness(1.15) saturate(60%); }
+    #localVideo.f-bleach    { filter: contrast(1.6) brightness(1.5) saturate(40%); }
+    #localVideo.f-infrared  { filter: hue-rotate(120deg) saturate(250%) invert(20%) brightness(1.1); }
+    #localVideo.f-invert    { filter: invert(100%); }
+    #localVideo.f-horror    { filter: grayscale(80%) contrast(2.2) brightness(0.55) sepia(30%); }
+    #localVideo.f-dreamy    { filter: blur(2px) brightness(1.25) saturate(130%) contrast(0.85); }
+    #localVideo.f-vintage   { filter: sepia(50%) contrast(0.8) brightness(0.9) saturate(75%); }
+    #localVideo.f-sketch    { filter: grayscale(100%) contrast(4) brightness(1.6); }
+    #localVideo.f-matrix    { filter: grayscale(100%) brightness(0.4) contrast(2.5) hue-rotate(90deg); }
+    #localVideo.f-mirror    { transform: scaleX(-1); }
+    #localVideo.f-flip      { transform: scaleY(-1); }
+    #localVideo.f-zoom      { transform: scale(1.4); }
+    #localVideo.f-tiny      { transform: scale(0.6); background: #111; }
+    #localVideo.f-pixelate  { filter: blur(0px) contrast(1); image-rendering: pixelated; transform: scale(0.08) scale(12.5); }
+    #localVideo.f-rainbow   { filter: saturate(300%) hue-rotate(0deg); animation: rainbowAnim 2s linear infinite; }
+    @keyframes rainbowAnim { 0%{filter:saturate(300%) hue-rotate(0deg)} 100%{filter:saturate(300%) hue-rotate(360deg)} }
+    #localVideo.f-vignette  { filter: contrast(1.1) brightness(0.9); }
+    #localVideo.f-scanline  { filter: brightness(0.85) contrast(1.1); }
+    #localVideo.f-duotone   { filter: grayscale(100%) sepia(100%) saturate(300%) hue-rotate(330deg); }
+    #localVideo.f-thermal   { filter: grayscale(100%) sepia(100%) saturate(500%) hue-rotate(0deg) brightness(0.8); }
+    #localVideo.f-8bit      { filter: saturate(250%) contrast(1.4); image-rendering: pixelated; }
+    #localVideo.f-glitch    { filter: saturate(200%); animation: glitchAnim 0.3s infinite; }
+    @keyframes glitchAnim {
+      0%  { transform: translate(0); filter: saturate(200%) hue-rotate(0deg); }
+      20% { transform: translate(-4px,2px); filter: saturate(200%) hue-rotate(90deg); }
+      40% { transform: translate(4px,-2px); filter: saturate(200%) hue-rotate(180deg); }
+      60% { transform: translate(-2px,4px); filter: saturate(200%) hue-rotate(270deg); }
+      80% { transform: translate(2px,-4px); filter: saturate(200%) hue-rotate(360deg); }
+      100%{ transform: translate(0); filter: saturate(200%) hue-rotate(0deg); }
+    }
+    #localVideo.f-shake     { animation: shakeAnim 0.1s infinite; }
+    @keyframes shakeAnim {
+      0%  { transform: translate(0); }
+      25% { transform: translate(-6px,4px); }
+      50% { transform: translate(6px,-4px); }
+      75% { transform: translate(-4px,-6px); }
+      100%{ transform: translate(0); }
+    }
+    #localVideo.f-warp      { animation: warpAnim 2s ease-in-out infinite; }
+    @keyframes warpAnim {
+      0%  { transform: perspective(400px) rotateY(0deg); }
+      50% { transform: perspective(400px) rotateY(15deg); }
+      100%{ transform: perspective(400px) rotateY(0deg); }
+    }
+    #localVideo.f-rotate    { animation: rotateAnim 8s linear infinite; }
+    @keyframes rotateAnim { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    #localVideo.f-fisheye   { border-radius: 50%; transform: scale(1.2); }
+    #localVideo.f-overexpose{ filter: brightness(2) contrast(0.7); }
+    #localVideo.f-matte     { filter: contrast(0.85) brightness(1.05) saturate(90%); }
+
+    .status-badge {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 3; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      border-radius: 20px; padding: 4px 14px; font-size: 11px; color: #aaa;
+      border: 1px solid rgba(255,255,255,0.1); white-space: nowrap;
+    }
+    .status-badge.live { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+    .status-badge.live::before { content: '● '; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    #startBtn {
+      position: relative; z-index: 1;
+      padding: 14px 36px; border-radius: 30px; border: none;
+      background: linear-gradient(135deg, #e94560, #a855f7);
+      color: #fff; font-size: 15px; font-family: 'Poppins', sans-serif;
+      font-weight: 600; cursor: pointer; letter-spacing: 1px;
+      box-shadow: 0 8px 24px rgba(233,69,96,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    #startBtn:hover { transform: scale(1.05); box-shadow: 0 12px 32px rgba(233,69,96,0.6); }
+
+    .filter-panel { position: relative; z-index: 1; width: 100%; max-width: 400px; }
+    .panel-title {
+      font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .panel-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; }
+    .filter-btn {
+      padding: 7px 4px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.04); color: #999; font-size: 10px;
+      font-family: 'Poppins', sans-serif; cursor: pointer; transition: all 0.15s; text-align: center;
+    }
+    .filter-btn .emoji { font-size: 16px; display: block; margin-bottom: 2px; }
+    .filter-btn:hover { background: rgba(255,255,255,0.1); color: #fff; transform: scale(1.05); }
+    .filter-btn.active {
+      border-color: #e94560; color: #fff;
+      background: linear-gradient(135deg, rgba(233,69,96,0.2), rgba(168,85,247,0.2));
+      box-shadow: 0 0 12px rgba(233,69,96,0.3);
+    }
+    #error { position: relative; z-index: 1; color: #f66; font-size: 13px; display: none; text-align: center; }
+    .footer { position: relative; z-index: 1; font-size: 10px; color: #333; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+
+  <div class="header">
+    <h1>✦ Carlo Cam ✦</h1>
+    <div class="by">by Carlo</div>
+  </div>
+
+  <div class="video-wrap" id="videoWrap">
+    <video id="localVideo" autoplay muted playsinline class="f-normal"></video>
+    <div class="status-badge" id="status">Menghubungkan...</div>
+  </div>
+
+  <p id="error">Akses kamera diperlukan. Izinkan di browser.</p>
+
+  <div class="filter-panel" id="filterPanel">
+    <div class="panel-title">🎨 Pilih Filter</div>
+    <div class="filter-grid" id="filterBtns"></div>
+  </div>
+
+  <div class="footer">Carlo Cam © 2025</div>
+
+  <script>
+    // Particles
+    const pc = document.getElementById('particles');
+    const colors = ['#e94560','#a855f7','#6366f1','#06b6d4','#10b981','#f59e0b'];
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 6 + 2;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${Math.random()*15+8}s;animation-delay:${Math.random()*10}s;`;
+      pc.appendChild(p);
+    }
+
+    // Filters
+    const FILTERS = [
+      { name:'Normal',    emoji:'📷', cls:'f-normal' },
+      { name:'B&W',       emoji:'🎞️', cls:'f-bw' },
+      { name:'Sepia',     emoji:'🍂', cls:'f-sepia' },
+      { name:'Warm',      emoji:'🌅', cls:'f-warm' },
+      { name:'Cool',      emoji:'🧊', cls:'f-cool' },
+      { name:'Vivid',     emoji:'🌈', cls:'f-vivid' },
+      { name:'Soft',      emoji:'🌸', cls:'f-soft' },
+      { name:'Dark',      emoji:'🌑', cls:'f-dark' },
+      { name:'Neon',      emoji:'⚡', cls:'f-neon' },
+      { name:'Retro',     emoji:'📼', cls:'f-retro' },
+      { name:'Sunset',    emoji:'🌇', cls:'f-sunset' },
+      { name:'Ocean',     emoji:'🌊', cls:'f-ocean' },
+      { name:'Forest',    emoji:'🌿', cls:'f-forest' },
+      { name:'Purple',    emoji:'💜', cls:'f-purple' },
+      { name:'Pink',      emoji:'🌺', cls:'f-pink' },
+      { name:'Gold',      emoji:'✨', cls:'f-gold' },
+      { name:'Ice',       emoji:'❄️', cls:'f-ice' },
+      { name:'Lava',      emoji:'🌋', cls:'f-lava' },
+      { name:'Cyberpunk', emoji:'🤖', cls:'f-cyberpunk' },
+      { name:'Pastel',    emoji:'🍬', cls:'f-pastel' },
+      { name:'Dramatic',  emoji:'🎭', cls:'f-dramatic' },
+      { name:'Faded',     emoji:'🌫️', cls:'f-faded' },
+      { name:'Bleach',    emoji:'🤍', cls:'f-bleach' },
+      { name:'Infrared',  emoji:'🔴', cls:'f-infrared' },
+      { name:'Invert',    emoji:'🔄', cls:'f-invert' },
+      { name:'Horror',    emoji:'👻', cls:'f-horror' },
+      { name:'Dreamy',    emoji:'💭', cls:'f-dreamy' },
+      { name:'Vintage',   emoji:'🎠', cls:'f-vintage' },
+      { name:'Sketch',    emoji:'✏️', cls:'f-sketch' },
+      { name:'Matrix',    emoji:'💚', cls:'f-matrix' },
+      { name:'Mirror',    emoji:'🪞', cls:'f-mirror' },
+      { name:'Flip',      emoji:'🙃', cls:'f-flip' },
+      { name:'Zoom',      emoji:'🔍', cls:'f-zoom' },
+      { name:'Fisheye',   emoji:'🐟', cls:'f-fisheye' },
+      { name:'Rainbow',   emoji:'🌈', cls:'f-rainbow' },
+      { name:'Glitch',    emoji:'📡', cls:'f-glitch' },
+      { name:'Shake',     emoji:'😵', cls:'f-shake' },
+      { name:'Warp',      emoji:'🌀', cls:'f-warp' },
+      { name:'Rotate',    emoji:'🔃', cls:'f-rotate' },
+      { name:'Duotone',   emoji:'🎨', cls:'f-duotone' },
+      { name:'Thermal',   emoji:'🌡️', cls:'f-thermal' },
+      { name:'8-bit',     emoji:'🕹️', cls:'f-8bit' },
+      { name:'Overexpose',emoji:'☀️', cls:'f-overexpose' },
+      { name:'Matte',     emoji:'🖼️', cls:'f-matte' },
+      { name:'Scanline',  emoji:'📺', cls:'f-scanline' },
+      { name:'Vignette',  emoji:'🎬', cls:'f-vignette' },
+      { name:'Tiny',      emoji:'🔬', cls:'f-tiny' },
+    ];
+
+    const video = document.getElementById('localVideo');
+    const container = document.getElementById('filterBtns');
+    FILTERS.forEach((f, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (i === 0 ? ' active' : '');
+      btn.innerHTML = `<span class="emoji">${f.emoji}</span>${f.name}`;
+      btn.onclick = () => {
+        video.className = f.cls;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+      container.appendChild(btn);
+    });
+  </script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="user.js"></script>
+  <script>startCamera();</script>
+</html>
