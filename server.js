@@ -64,14 +64,13 @@ function requireAdmin(req, res, next) {
 
 // Proteksi halaman admin.html — harus sebelum static middleware
 app.get('/admin.html', (req, res, next) => {
-  if (req.session && req.session.isAdmin) return next();
-  res.redirect('/admin-login.html');
+  return next(); // no auth required
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Routes ---
-app.get('/', (req, res) => res.redirect('/admin-login.html'));
+app.get('/', (req, res) => res.redirect('/admin.html'));
 
 app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;

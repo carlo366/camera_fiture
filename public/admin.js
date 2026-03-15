@@ -9,12 +9,6 @@ let socket = null;
 
 // Cek session login dulu sebelum apapun
 (async () => {
-  const res = await fetch('/api/admin/check');
-  const data = await res.json();
-  if (!data.isAdmin) {
-    window.location.href = '/admin-login.html';
-    return;
-  }
   initDashboard();
 })();
 
